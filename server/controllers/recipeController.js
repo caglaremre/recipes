@@ -71,7 +71,22 @@ exports.exploreLatest = async (req, res) => {
         const recipe = await Recipe.find({}).sort({ _id: -1 }).limit(limitNumber);
         res.render('explore-latest', { title: 'Explore Latest', recipe })
     } catch (error) {
-        
+        res.status(500).send({ message: error.message || "Error occured" });
+    }
+}
+
+/**
+ * GET /random-recipe
+ * Random Recipe
+ */
+exports.randomRecipe = async (req, res) => {
+    try {
+    let count = await Recipe.find().countDocuments();
+    let random = Math.floor(Math.random() * count);
+    let recipe = await Recipe.findOne({}).skip(random).exec();
+    res.render('recipe', { title: recipe.name, recipe });
+    } catch {
+        res.status(500).send({ message: error.message || "Error occured" });
     }
 }
 
