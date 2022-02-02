@@ -11,14 +11,13 @@ exports.homepage = async (req, res) => {
     try {
         const limitNumber = 5;
         const categories = await Category.find({}).limit(limitNumber);
-        const latest = await Recipe.find({}).sort({_id: -1}).limit(limitNumber);
+        const latest = await Recipe.find({}).sort({ _id: -1 }).limit(limitNumber);
         const food = { latest };
         res.render('index', { title: 'Tarifler - Anasayfa', categories, food });
     } catch (error) {
         res.status(500).send({ message: error.message || "Error Occured" });
     }
 }
-
 
 /**
  * GET /categories
@@ -34,9 +33,46 @@ exports.exploreCategories = async (req, res) => {
     }
 }
 
+/**
+ * GET /categories/:id
+ * Categories By Id
+ */
+exports.exploreCategoriesById = async (req, res) => {
+    try {
+        const limitNumber = 20;
+        const recipes = await Recipe.find({ category: req.params.id }).limit(limitNumber);
+        res.render('categories', { title: 'Tarifler - ' + req.params.id, recipes });
+    } catch (error) {
+        res.status(500).send({ message: error.message || ' Error Occured' });
+    }
+}
 
+/**
+ * GET /recipe/:id
+ * Recipe
+ */
+exports.exploreRecipe = async (req, res) => {
+    try {
+        const recipe = await Recipe.findById(req.params.id);
+        res.render('recipe', { title: recipe.name, recipe });
+    } catch (error) {
+        res.status(500).send({ message: error.message || "Error occured" });
+    }
 
+}
 
+/**
+ * POST /search
+ * Search
+ */
+exports.searchRecipe = async (req, res) => {
+    try {
+        let recipe = await Recipe.find({ $text: { $search: req.body.searchTerm, $diacriticSensitive: true } });
+        res.render('search', { title: 'Search', recipe });
+    } catch (error) {
+        res.status(500).send({ message: error.message || "Error occured" });
+    }
+}
 
 
 
@@ -83,7 +119,7 @@ exports.exploreCategories = async (req, res) => {
 // async function insertDymmyRecipeData(){
 //   try {
 //     await Recipe.insertMany([
-//       { 
+//       {
 //         "name": "Recipe Name Goes Here",
 //         "description": `Recipe Description Goes Here`,
 //         "email": "recipeemail@raddy.co.uk",
@@ -92,10 +128,10 @@ exports.exploreCategories = async (req, res) => {
 //           "1 level teaspoon cayenne pepper",
 //           "1 level teaspoon hot smoked paprika",
 //         ],
-//         "category": "American", 
+//         "category": "American",
 //         "image": "southern-friend-chicken.jpg"
 //       },
-//       { 
+//       {
 //         "name": "Recipe Name Goes Here",
 //         "description": `Recipe Description Goes Here`,
 //         "email": "recipeemail@raddy.co.uk",
@@ -104,10 +140,10 @@ exports.exploreCategories = async (req, res) => {
 //           "1 level teaspoon cayenne pepper",
 //           "1 level teaspoon hot smoked paprika",
 //         ],
-//         "category": "Thai", 
+//         "category": "Thai",
 //         "image": "southern-friend-chicken.jpg"
 //       },
-//       { 
+//       {
 //         "name": "Recipe Name Goes Here",
 //         "description": `Recipe Description Goes Here`,
 //         "email": "recipeemail@raddy.co.uk",
@@ -116,10 +152,10 @@ exports.exploreCategories = async (req, res) => {
 //           "1 level teaspoon cayenne pepper",
 //           "1 level teaspoon hot smoked paprika",
 //         ],
-//         "category": "Mexican", 
+//         "category": "Mexican",
 //         "image": "southern-friend-chicken.jpg"
 //       },
-//       { 
+//       {
 //         "name": "Recipe Name Goes Here",
 //         "description": `Recipe Description Goes Here`,
 //         "email": "recipeemail@raddy.co.uk",
@@ -128,10 +164,10 @@ exports.exploreCategories = async (req, res) => {
 //           "1 level teaspoon cayenne pepper",
 //           "1 level teaspoon hot smoked paprika",
 //         ],
-//         "category": "Indian", 
+//         "category": "Indian",
 //         "image": "southern-friend-chicken.jpg"
 //       },
-//       { 
+//       {
 //         "name": "Recipe Name Goes Here",
 //         "description": `Recipe Description Goes Here`,
 //         "email": "recipeemail@raddy.co.uk",
@@ -140,10 +176,10 @@ exports.exploreCategories = async (req, res) => {
 //           "1 level teaspoon cayenne pepper",
 //           "1 level teaspoon hot smoked paprika",
 //         ],
-//         "category": "Chinese", 
+//         "category": "Chinese",
 //         "image": "southern-friend-chicken.jpg"
 //       },
-//       { 
+//       {
 //         "name": "Recipe Name Goes Here",
 //         "description": `Recipe Description Goes Here`,
 //         "email": "recipeemail@raddy.co.uk",
@@ -152,7 +188,7 @@ exports.exploreCategories = async (req, res) => {
 //           "1 level teaspoon cayenne pepper",
 //           "1 level teaspoon hot smoked paprika",
 //         ],
-//         "category": "American", 
+//         "category": "American",
 //         "image": "southern-friend-chicken.jpg"
 //       }
 //     ]);
