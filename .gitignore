@@ -133,3 +133,6 @@ dist
 .vs
 bin
 obj
+
+# ESLint
+.eslint*
