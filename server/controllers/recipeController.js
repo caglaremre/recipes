@@ -85,8 +85,64 @@ exports.randomRecipe = async (req, res) => {
     let random = Math.floor(Math.random() * count);
     let recipe = await Recipe.findOne({}).skip(random).exec();
     res.render('recipe', { title: recipe.name, recipe });
-    } catch {
+    } catch (error) {
         res.status(500).send({ message: error.message || "Error occured" });
+    }
+}
+
+/**
+ * GET /submit-recipe
+ * Submit Recipe
+ */
+exports.submitRecipe = async (req, res) => {
+    const infoErrorObj = req.flash('infoError');
+    const infoSuccessObj = req.flash('infoSuccess');
+    try {
+        res.render('submit-recipe', { title: 'Submit Recipe', infoErrorObj, infoSuccessObj });
+    } catch (error) {
+        res.status(500).send({ message: error.message || "Error occured" });
+    }
+}
+
+/**
+ * POST /submit-recipe
+ * Submit Recipe
+ */
+exports.submitRecipePOST = async (req, res) => {
+    try {
+        let imageUploadFile;
+        let uploadPath;
+        let newImageName;
+
+        if (!req.files || Object.keys(req.files) === 0) {
+            console.log('No files uploaded');
+        } else {
+            imageUploadFile = req.files.image;
+            newImageName = Date.now() + imageUploadFile.name;
+            uploadPath = require('path').resolve('./') + '/public/img/' + newImageName;
+
+            imageUploadFile.mv(uploadPath, (err) => {
+                if (err) {
+                    return res.status(500).send(err);
+                }
+            });
+        }
+
+        const newRecipe = new Recipe({
+            name: req.body.name,
+            description: req.body.description,
+            email: req.body.email,
+            ingredients: req.body.ingredients,
+            category: req.body.category,
+            image: newImageName
+        });
+        await newRecipe.save();
+        
+        req.flash('infoSuccess', 'Recipe has been added');
+        res.redirect('submit-recipe');
+    } catch (error) {
+        req.flash('infoError', error.message);
+        res.redirect('submit-recipe');
     }
 }
 
